@@ -1,0 +1,2 @@
+java -jar ./antlr-4.13.2-complete.jar -Dlanguage=Java TSqlLexer.g4
+java -jar ./antlr-4.13.2-complete.jar -Dlanguage=Java TSqlParser.g4 -visitor

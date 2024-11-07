@@ -16,6 +16,9 @@ BEGIN
 END
 GO
 
+DROP PROC IF EXISTS $$TABLE_NAME$$_update
+GO
+
 CREATE PROCEDURE $$TABLE_NAME$$_update
     $$LISTSEPARATED$$
     AS
@@ -24,8 +27,8 @@ BEGIN
 
     UPDATE $$TABLE_NAME$$
     SET $$PAIRS$$
-    OUTPUT INSERTED.id INTO @id_
-    WHERE id = @id
+    OUTPUT INSERTED.$$KEY$$ INTO @id_
+    WHERE $$KEY$$ = @$$KEY$$
 
     SELECT * FROM @id_;
 END

@@ -11,7 +11,7 @@ IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'owner'
                 modified_at datetime NULL,
                 deleted_by nvarchar(150) NULL,
                 deleted_at datetime NULL,
-                CONSTRAINT PK_owner PRIMARY KEY CLUSTERED (id ASC) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+                CONSTRAINT PK_owner PRIMARY KEY (id) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
             )
             ON [PRIMARY]
         END

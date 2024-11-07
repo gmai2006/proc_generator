@@ -21,12 +21,12 @@ public class CreateStoredProc {
         List<Table> tables = subtree.stream().map(table -> {
             String tableName = extractTableName(table, parser);
             List<Column> cols = extractColumns(table, parser);
-            return new Table(tableName, cols);
+            String key = extractPrimaryKey(table, parser);
+            return new Table(tableName, key, cols);
         }).collect(Collectors.toList());
 
         String stored = tables.stream().map(CreateStoredProc::generateStoredProcedure).collect(Collectors.joining("\n"));
         System.out.println(stored);
-
     }
 
     static String generateStoredProcedure(Table t) {
@@ -35,10 +35,19 @@ public class CreateStoredProc {
         source = source.replace("$$LIST$$", t.generateListOfParameters());
         source = source.replace("$$LISTVALUE$$", t.generateListOfValues());
         source = source.replace("$$LISTSEPARATED$$", t.generateListOfSeparatedParameters());
-        source = source.replace("$$PAIRS$$", t.generateId());
-        return source.replace("$$ID$$", t.generateListOfPairs());
+        source = source.replace("$$PAIRS$$", t.generateListOfPairs());
+        source = source.replace("$$KEY$$", t.key);
+        return source.replace("$$ID$$", t.generateId());
     }
 
+    static String extractPrimaryKey(ParseTree tree, TSqlParser parser) {
+        final String xpath = "//table_constraint/column_name_list_with_order";
+        final Collection<ParseTree> subtree = XPath.findAll(tree, xpath, parser);
+        if (null == subtree || subtree.isEmpty()) throw new IllegalArgumentException("NO primary key FOUND!!!");
+        final TSqlParser.Column_name_list_with_orderContext nameList = (TSqlParser.Column_name_list_with_orderContext)subtree.iterator().next();
+        final List<TSqlParser.Id_Context> names = nameList.id_();
+        return names.stream().map(name -> new TSqlQueryBasedVisitor().visitId_(name)).toList().get(0);
+    }
     static String extractTableName(ParseTree tree, TSqlParser parser) {
         final String xpath = "//table_name";
         final Collection<ParseTree> subtree = XPath.findAll(tree, xpath, parser);
@@ -70,11 +79,15 @@ public class CreateStoredProc {
 
     private static class Table {
         String tableName;
+
+        String key;
         List<Column> columns;
 
         //@name, description=@description, modified_by=@modified_by, modified_at=@modified_at
         public String generateListOfPairs() {
-            return columns.stream().map(c -> c.name + "=@" + c.name).collect(Collectors.joining(", "));
+            return columns.stream()
+                    .filter(c -> !c.name.equals(key))
+                    .map(c -> c.name + "=@" + c.name).collect(Collectors.joining(", "));
         }
         //id, name, description, created_by, created_at
         public String generateListOfParameters() {
@@ -87,7 +100,7 @@ public class CreateStoredProc {
         }
 
         public String generateId() {
-            final Column id =getPrimaryKey();
+            final Column id = getPrimaryKey();
             return id.name + " " + id.type;
         }
 
@@ -103,13 +116,14 @@ public class CreateStoredProc {
             return columns.stream().map(col -> "@" + col.name + " " + col.type).collect(Collectors.joining(",\n"));
         }
 
-        public Table(String name, List<Column> cols) {
+        public Table(String name, String key, List<Column> cols) {
             this.tableName = name;
+            this.key = key;
             this.columns = cols;
         }
 
         public Column getPrimaryKey() {
-            Predicate<Column> isKey = c -> c.type.contains("uniqueidentifier");
+            Predicate<Column> isKey = c -> c.name.equals(key);
             List<Column> keys = columns.stream().filter(isKey).collect(Collectors.toList());
             return keys.get(0);
         }

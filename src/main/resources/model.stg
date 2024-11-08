@@ -35,3 +35,28 @@ setMethod(col) ::= <<
         this.$col.name$ = $col.name$;
     }
 >>
+
+caseStatements(cols) ::= <<
+$cols: {col | $caseStatement(col)$}; separator="\n"$
+>>
+
+caseStatement(col) ::= <<
+case "$col.name$":
+    $if(col.uuidType)$$setUuid(col)$
+    $elseif(col.dateTimeType)$$setDateTimeCol(col)$
+    $else$$setCol(col)$
+    $endif$
+    break;
+>>
+
+setUuid(col) ::= <<
+result.set$col.fieldName$(UUID.fromString(entry.getValue()));
+>>
+
+setDateTimeCol(col) ::= <<
+result.set$col.fieldName$(DataConverters.converToTimestamp(entry.getValue()));
+>>
+
+setCol(col) ::= <<
+result.set$col.fieldName$(entry.getValue());
+>>

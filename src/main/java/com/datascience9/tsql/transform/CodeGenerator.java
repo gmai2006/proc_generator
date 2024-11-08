@@ -17,26 +17,27 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.StringRenderer;
 
-public class CreateStoredProc {
+public class CodeGenerator {
     public static void main(String[] args) throws Exception {
         final List<Table> tables = TableExtractor.generateTablesFromTsql("/tsql.sql");
+        final String header = TsqlUtils.loadResource2String("/header.txt");
 
-//        final String stored = tables.stream().map(CreateStoredProc::generateStoredProcedure).collect(Collectors.joining("\n"));
-//        final Path storedOutput = Paths.get("./", "stored.sql");
-//        writeStringWithoutFormatToFile(storedOutput, stored);
-//        System.out.println(stored);
-
+        final String stored = tables.stream().map(CodeGenerator::generateStoredProcedure).collect(Collectors.joining("\n"));
+        final Path storedOutput = Paths.get("./", "stored.sql");
+        TsqlUtils.writeStringWithoutFormatToFile(storedOutput, stored);
+        System.out.println(stored);
 
         tables.stream().forEach(t -> {
-            createDao(t);
-            createModel(t);
-//            createService(t);
+            createDao(t, header);
+            createModel(t, header);
+//            createService(t, header);
         });
     }
 
-    static void createDao(Table t) {
-        STGroup  stGroup = getStGroupFromClient(CreateStoredProc.class, "dao.stg", '$', '$');
+    static void createDao(Table t, String header) {
+        STGroup  stGroup = getStGroupFromClient(CodeGenerator.class, "dao.stg", '$', '$');
         String dao = generateDao(t, stGroup);
+        dao = dao.replace("@@HEADER@@", header);
         final Path output = Paths.get("./src/main/java/", buildCamelCase(t.tableName) + "Dao.java");
         try {
             writeStringToJava(output, dao);
@@ -59,14 +60,15 @@ public class CreateStoredProc {
         String source = TsqlUtils.loadResource2String("/dao_template.txt");
         source = source.replace("@@beanName@@", buildCamelCase(t.tableName));
         source = source.replace("@@beanName_lowercase@@", buildCamelCase(t.tableName).toLowerCase(Locale.ROOT));
-        ST st = stGroup.getInstanceOf("params");
-        st.add("cols", t.columns.stream().map(Column::getFieldName).collect(Collectors.toList()));
+        ST st = stGroup.getInstanceOf("parameters");
+        st.add("cols", t.columns);
         return source.replace("@@PARAMS@@", st.render());
     }
 
-    static void createModel(Table t) {
-        STGroup  stGroup = getStGroupFromClient(CreateStoredProc.class, "model.stg", '$', '$');
+    static void createModel(Table t, String header) {
+        STGroup  stGroup = getStGroupFromClient(CodeGenerator.class, "model.stg", '$', '$');
         String result = generateModel(t, stGroup);
+        result = result.replace("@@HEADER@@", header);
         final Path output = Paths.get("./src/main/java/", buildCamelCase(t.tableName) + ".java");
         try {
             writeStringToJava(output, result);
@@ -81,21 +83,28 @@ public class CreateStoredProc {
         source = source.replace("@@beanName_lowercase@@", buildCamelCase(t.tableName).toLowerCase(Locale.ROOT));
         source = source.replace("@@LIST@@", t.generateListOfParameters());
 
-        ST st = stGroup.getInstanceOf("members");
-        st.add("cols", t.columns);
-        source = source.replace("@@MEMBERS@@", st.render());
+        ST memberSt = stGroup.getInstanceOf("members");
+        memberSt.add("cols", t.columns);
+        source = source.replace("@@MEMBERS@@", memberSt.render());
 
-        ST st1 = stGroup.getInstanceOf("getMethods");
-        st1.add("cols", t.columns);
-        source = source.replace("@@GETMETHODS@@", st1.render());
+        ST getMethodSt = stGroup.getInstanceOf("getMethods");
+        getMethodSt.add("cols", t.columns);
+        source = source.replace("@@GETMETHODS@@", getMethodSt.render());
 
-        ST st2 = stGroup.getInstanceOf("setMethods");
-        st2.add("cols", t.columns);
-        return source.replace("@@SETMETHODS@@", st2.render());
+        ST caseSt = stGroup.getInstanceOf("caseStatements");
+        caseSt.add("cols", t.columns);
+        String render = caseSt.render();
+        System.out.println(render);
+        source = source.replace("@@CASES@@", render);
+
+        ST setMethodSt = stGroup.getInstanceOf("setMethods");
+        setMethodSt.add("cols", t.columns);
+        return source.replace("@@SETMETHODS@@", setMethodSt.render());
     }
 
-    static void createService(Table t) {
+    static void createService(Table t, String header) {
         String result = generateService(t);
+        result = result.replace("@@HEADER@@", header);
         final Path output = Paths.get("./src/main/java/Default", buildCamelCase(t.tableName) + "Service.java");
         try {
             writeStringToJava(output, result);

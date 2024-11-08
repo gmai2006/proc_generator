@@ -1,0 +1,7 @@
+/*
+ * DISTRIBUTION STATEMENT C. Distribution authorized to U.S. Government Agencies and their
+ * contractors; Administrative or Operational Use; Premature Dissemination; 14 Jun 2024.
+ * Other requests shall be referred to the Technical Director, Geospatial Research and Engineering,
+ * U.S. Army Engineer Research and Development Center, 7701 Telegraph Road,
+ * Building 2592, Alexandria, VA 22315.
+ */

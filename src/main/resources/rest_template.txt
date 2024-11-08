@@ -1,12 +1,4 @@
-/*
- * DISTRIBUTION STATEMENT C. Distribution authorized to U.S. Government Agencies and their
- * contractors; Administrative or Operational Use; Premature Dissemination; 19 Jun 2024.
- * Other requests shall be referred to the Technical Director, Geospatial Research and Engineering,
- * U.S. Army Engineer Research and Development Center, 7701 Telegraph Road,
- * Building 2592, Alexandria, VA 22315.
- */
-
-package mil.dren.erdc.sapi.owner.rest.v1;
+@@HEADER@@
 
 import jakarta.ejb.EJB;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,12 +14,7 @@ import jakarta.ws.rs.core.MediaType;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import mil.dren.erdc.sapi.owner.models.Owner;
-import mil.dren.erdc.sapi.owner.service.OwnerService;
-import mil.dren.erdc.sapi.security.annotation.Authorize;
-import mil.dren.erdc.sapi.security.enums.Permission;
-import mil.dren.erdc.sapi.utils.exceptions.DatabaseHandlerException;
-import mil.dren.erdc.sapi.utils.exceptions.MissingArgumentException;
+
 
 /**
  * REST context and service for data owner related functionality.

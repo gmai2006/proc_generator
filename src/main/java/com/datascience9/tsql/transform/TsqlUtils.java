@@ -2,7 +2,10 @@ package com.datascience9.tsql.transform;
 
 import com.datascience9.tsql.parse.TSqlLexer;
 import com.datascience9.tsql.parse.TSqlParser;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -126,5 +129,21 @@ public class TsqlUtils {
       return oldName;
     }
     return String.join("", Arrays.stream(tokens).map(TsqlUtils::convertWord2CamelCaseWord).collect(Collectors.toList()));
+  }
+
+  /**
+   * Write string to a file.
+   * @param path - the output file.
+   * @param s the input string.
+   */
+  public static void writeStringWithoutFormatToFile(Path path, String s) {
+    if (null == path) {
+      throw new IllegalArgumentException("Input file required!");
+    }
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile()))) {
+      writer.write(s);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
   }
 }

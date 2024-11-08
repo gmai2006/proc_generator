@@ -32,11 +32,14 @@ public class Column {
         return constraint;
     }
 
-    public boolean getIsToString() {
-        return type.contains("uniqueidentifier")
-                || type.contains("Date")
-                || type.contains("Timestamp");
+    public boolean getUuidType() {
+        return type.contains("uniqueidentifier");
     }
+    public boolean getDateTimeType() {
+        return type.contains("datetime");
+    }
+
+    public boolean getNonString() { return !(type.contains("nvachar") || type.contains("varchar"));}
 
     @Override
     public String toString() {

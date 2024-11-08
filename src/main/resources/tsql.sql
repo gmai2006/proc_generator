@@ -23,9 +23,9 @@ GO
 CREATE TABLE geosearch_column (
     id uniqueidentifier NOT NULL,
     ads nvarchar(128) NOT NULL,
-    column_name nvarchar(512) NOT NULL,
-    display_name nvarchar(128) NOT NULL,
-    data_type nvarchar(128) NOT NULL,
+    columnName nvarchar(512) NOT NULL,
+    displayName nvarchar(128) NOT NULL,
+    dataType nvarchar(128) NOT NULL,
     CONSTRAINT pk_geosearch_column PRIMARY KEY(id)
 )
 GO
@@ -39,7 +39,7 @@ GO
 CREATE TABLE geosearch_dictionary (
     id uniqueidentifier NOT NULL,
     ads nvarchar(128) NOT NULL,
-    column_name nvarchar(512) NOT NULL,
+    columnName nvarchar(512) NOT NULL,
     value nvarchar(512) NOT NULL,
     translation VARCHAR(5000) NOT NULL,
     CONSTRAINT pk_geosearch_dictionary PRIMARY KEY(id)
@@ -99,7 +99,7 @@ END
 GO
 CREATE TABLE geosearch_polygon_filter (
     id uniqueidentifier NOT NULL,
-    queryId nvarchar(36) NOT NULL,
+    queryId uniqueidentifier NOT NULL,
     coordinates nvarchar(512) NOT NULL,
     CONSTRAINT geosearch_polygon_filter_primary PRIMARY KEY(id)
 )

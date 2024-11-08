@@ -1,3 +1,5 @@
+@@HEADER@@
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Locale;
@@ -26,4 +28,16 @@ public class @@beanName@@ implements Serializable {
     public int hashCode() {
         return Objects.hash(@@LIST@@);
     }
+
+    public static @@beanName@@ parseDataObject(Map<String, String> stringMap) {
+            @@beanName@@ result = new @@beanName@@();
+            for (Map.Entry<String, String> entry : stringMap.entrySet()) {
+                switch (entry.getKey().toLowerCase(Locale.ENGLISH)) {
+                    @@CASES@@
+                    default:
+                        break;
+                }
+            }
+            return result;
+        }
 }

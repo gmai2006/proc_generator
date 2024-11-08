@@ -1,12 +1,4 @@
-/*
- * DISTRIBUTION STATEMENT C. Distribution authorized to U.S. Government Agencies and their
- * contractors; Administrative or Operational Use; Premature Dissemination; 14 Jun 2024.
- * Other requests shall be referred to the Technical Director, Geospatial Research and Engineering,
- * U.S. Army Engineer Research and Development Center, 7701 Telegraph Road,
- * Building 2592, Alexandria, VA 22315.
- */
-
-package mil.dren.erdc.sapi.@@beanName_lowercase@@.service;
+@@HEADER@@
 
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
@@ -14,12 +6,6 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import mil.dren.erdc.sapi.events.models.Topic;
-import mil.dren.erdc.sapi.events.service.EventsService;
-import mil.dren.erdc.sapi.@@beanName_lowercase@@.models.@@beanName@@;
-import mil.dren.erdc.sapi.@@beanName_lowercase@@.service.dao.@@beanName@@Dao;
-import mil.dren.erdc.sapi.utils.exceptions.DatabaseHandlerException;
-import mil.dren.erdc.sapi.utils.exceptions.MissingArgumentException;
 
 /**
  * Default implementation of {@link @@beanName@@Service}.

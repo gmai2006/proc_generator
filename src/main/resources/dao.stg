@@ -1,7 +1,10 @@
-param(col) ::= <<
-$params.add(o.get$col$().toString())$
+parameters(cols) ::= <<
+$cols: {col | $parameter(col)$}$
 >>
 
-params(cols) ::= <<
-$cols: {col | $param(col)$}$
+parameter(col) ::= <<
+$if(col.nonString)$params.add(o.get$col.fieldName$().toString());
+$else$params.add(o.get$col.fieldName$());
+$endif$
 >>
+

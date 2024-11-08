@@ -1,0 +1,7 @@
+param(col) ::= <<
+$params.add(o.get$col$().toString())$
+>>
+
+params(cols) ::= <<
+$cols: {col | $param(col)$}$
+>>

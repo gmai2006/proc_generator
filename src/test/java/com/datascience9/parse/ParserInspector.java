@@ -1,6 +1,6 @@
 package com.datascience9.parse;
 
-import com.datascience9.tsql.TsqlUtils;
+import com.datascience9.tsql.transform.TsqlUtils;
 import com.datascience9.tsql.parse.TSqlParser;
 import java.util.logging.Logger;
 import org.antlr.v4.gui.Trees;

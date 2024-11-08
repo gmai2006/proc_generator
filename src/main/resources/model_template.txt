@@ -1,0 +1,29 @@
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+
+/**
+ * Class representative of data owner objects.
+ */
+public class @@beanName@@ implements Serializable {
+
+    @@MEMBERS@@
+
+    /**
+     * Default constructor.
+     */
+    public @@beanName@@() {
+    }
+
+    @@GETMETHODS@@
+
+    @@SETMETHODS@@
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(@@LIST@@);
+    }
+}

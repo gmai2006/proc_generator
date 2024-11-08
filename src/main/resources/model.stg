@@ -1,0 +1,37 @@
+member(type, name) ::= <<
+private $type$ $name$;
+>>
+
+members(cols) ::= <<
+$cols: {col | $member(col.type, col.name)$}; separator="\n"$
+>>
+
+getMethods(cols) ::=<<
+$cols: {col | $getMethod(col)$}; separator="\n"$
+>>
+
+getMethod(col) ::= <<
+/**
+     * Gets the $col.name$ field value.
+     *
+     * @return $col.name$
+     */
+    public $col.type$ get$col.fieldName$() {
+        return $col.name$;
+    }
+>>
+
+setMethods(cols) ::= <<
+$cols: {col | $setMethod(col)$}; separator="\n"$
+>>
+
+setMethod(col) ::= <<
+/**
+     * Sets the  $col.name$ field value.
+     *
+     * @param  $col.name$
+     */
+    public void set$col.fieldName$($col.type$ $col.name$) {
+        this.$col.name$ = $col.name$;
+    }
+>>

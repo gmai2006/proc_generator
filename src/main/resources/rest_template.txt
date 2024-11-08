@@ -1,0 +1,128 @@
+/*
+ * DISTRIBUTION STATEMENT C. Distribution authorized to U.S. Government Agencies and their
+ * contractors; Administrative or Operational Use; Premature Dissemination; 19 Jun 2024.
+ * Other requests shall be referred to the Technical Director, Geospatial Research and Engineering,
+ * U.S. Army Engineer Research and Development Center, 7701 Telegraph Road,
+ * Building 2592, Alexandria, VA 22315.
+ */
+
+package mil.dren.erdc.sapi.owner.rest.v1;
+
+import jakarta.ejb.EJB;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+import mil.dren.erdc.sapi.owner.models.Owner;
+import mil.dren.erdc.sapi.owner.service.OwnerService;
+import mil.dren.erdc.sapi.security.annotation.Authorize;
+import mil.dren.erdc.sapi.security.enums.Permission;
+import mil.dren.erdc.sapi.utils.exceptions.DatabaseHandlerException;
+import mil.dren.erdc.sapi.utils.exceptions.MissingArgumentException;
+
+/**
+ * REST context and service for data owner related functionality.
+ */
+@Path("/v1")
+public class V1 {
+
+    @Context
+    private HttpServletRequest request;
+
+    @EJB(lookup = "java:global/sapi-owner/sapi-owner-service/OwnerService")
+    private OwnerService ownerService;
+
+    /**
+     * Method to test service's state.
+     *
+     * @return {@link Date} as string.
+     */
+    @GET
+    @Path("/ping")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String ping() {
+        return new Date().toString();
+    }
+
+    /**
+     * Creates a data owner.
+     *
+     * @param owner {@link Owner}
+     * @return UUID as {@link String} owner ID
+     */
+    @POST
+    @Path("/")
+    @Produces(MediaType.TEXT_PLAIN)
+    @Authorize({Permission.OWNER_CREATE})
+    public UUID create(Owner owner) throws MissingArgumentException, DatabaseHandlerException {
+        String requestingUser = request.getUserPrincipal().getName();
+        return ownerService.create(owner, requestingUser);
+    }
+
+    /**
+     * Deletes the data owner matching the specified owner ID.
+     *
+     * @param ownerId UUID as {@link String}
+     */
+    @DELETE
+    @Path("/{ownerId: [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}")
+    @Authorize({Permission.OWNER_DELETE})
+    public void delete(@PathParam("ownerId") String ownerId) throws DatabaseHandlerException {
+        String requestingUser = request.getUserPrincipal().getName();
+        ownerService.delete(UUID.fromString(ownerId), requestingUser);
+    }
+
+    /**
+     * Gets the data owner matching the specified owner ID.
+     *
+     * @param ownerId UUID as {@link String}
+     * @return owner {@link Owner}
+     */
+    @GET
+    @Path("/{ownerId: [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Authorize({Permission.OWNER_READ})
+    public Owner get(@PathParam("ownerId") String ownerId) throws DatabaseHandlerException {
+        return ownerService.get(UUID.fromString(ownerId));
+    }
+
+    /**
+     * Gets all data owners.
+     *
+     * @return {@link List} of {@link Owner}
+     */
+    @GET
+    @Path("/all")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Authorize({Permission.OWNER_READ})
+    public List<Owner> getAll() throws DatabaseHandlerException {
+        return ownerService.getAll();
+    }
+
+    /**
+     * Updates the data owner matching the specified owner ID.
+     *
+     * @param ownerId UUID as {@link String}
+     * @param owner   {@link Owner} being modified
+     * @return UUID as {@link String} owner ID
+     */
+    @PUT
+    @Path("/{ownerId: [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}")
+    @Produces(MediaType.TEXT_PLAIN)
+    @Authorize({Permission.OWNER_UPDATE})
+    public UUID update(@PathParam("ownerId") String ownerId, Owner owner) throws MissingArgumentException,
+            DatabaseHandlerException {
+        String requestingUser = request.getUserPrincipal().getName();
+        owner.setId(UUID.fromString(ownerId));
+        return ownerService.update(owner, requestingUser);
+    }
+}

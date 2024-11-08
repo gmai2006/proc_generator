@@ -1,31 +1,31 @@
 /* CREATE THE geosearch TABLES IN THE LOCAL PERSISTENCE DATABASE */
 if exists (select * from INFORMATION_SCHEMA.TABLES where table_name = 'geosearch_ads')
 begin
-    DROP TABLE testtable1
+    DROP TABLE geosearch_ads
 END
 GO
-CREATE TABLE testtable1 (
+CREATE TABLE geosearch_ads (
     ads nvarchar(128) NOT NULL,
-    haha nvarchar(512) NOT NULL,
-    testme nvarchar(128) NULL,
-    test2 nvarchar(128) NOT NULL,
-    test3 nvarchar(128) NULL,
+    viewName nvarchar(512) NOT NULL,
+    displayName nvarchar(128) NULL,
+    mbpsWildflyDataSource nvarchar(128) NOT NULL,
+    symbolCustomDataKey nvarchar(128) NULL,
     CONSTRAINT pk_geosearch_ads PRIMARY KEY(ads)
 )
 GO
 
 if exists (select * from INFORMATION_SCHEMA.TABLES where table_name = 'geosearch_column')
 BEGIN
-    DROP TABLE testtabl2
+    DROP TABLE geosearch_column
 END
 GO
 
-CREATE TABLE testtabl2 (
+CREATE TABLE geosearch_column (
     id uniqueidentifier NOT NULL,
     ads nvarchar(128) NOT NULL,
-    dddd nvarchar(512) NOT NULL,
-    ggg nvarchar(128) NOT NULL,
-    dddeee nvarchar(128) NOT NULL,
+    column_name nvarchar(512) NOT NULL,
+    display_name nvarchar(128) NOT NULL,
+    data_type nvarchar(128) NOT NULL,
     CONSTRAINT pk_geosearch_column PRIMARY KEY(id)
 )
 GO

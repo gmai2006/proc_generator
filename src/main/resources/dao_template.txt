@@ -1,0 +1,95 @@
+/*
+ * DISTRIBUTION STATEMENT C. Distribution authorized to U.S. Government Agencies and their
+ * contractors; Administrative or Operational Use; Premature Dissemination; 24 Jun 2024.
+ * Other requests shall be referred to the Technical Director, Geospatial Research and Engineering,
+ * U.S. Army Engineer Research and Development Center, 7701 Telegraph Road,
+ * Building 2592, Alexandria, VA 22315.
+ */
+
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.NotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import mil.dren.erdc.sapi.dbhandler.service.DatabaseHandlerService;
+import mil.dren.erdc.sapi.@@beanName_lowercase@@.models.@@beanName@@;
+import mil.dren.erdc.sapi.utils.exceptions.DatabaseHandlerException;
+
+/**
+ * Class responsible for all database interaction related to the @@beanName@@ Service.
+ */
+public class @@beanName@@Dao {
+
+    private final DatabaseHandlerService databaseHandlerService;
+    private final String sapiDbName;
+
+    @Inject
+    @@beanName@@Dao(DatabaseHandlerService databaseHandlerService) {
+        this.databaseHandlerService = databaseHandlerService;
+        this.sapiDbName = this.databaseHandlerService.getSapiDbName();
+    }
+
+    /**
+     * Method responsible for creating the provided @@beanName_lowercase@@ object in the database.
+     */
+    public UUID create(@@beanName@@ o) throws DatabaseHandlerException {
+        List<String> params = new ArrayList<>();
+        @@PARAMS@@
+        databaseHandlerService.executeStoredProcedure("@@beanName_lowercase@@_create", sapiDbName, params, false);
+        return o.getId();
+    }
+
+    /**
+     * Method responsible for updating the specified o object in the database.
+     */
+    public UUID update(@@beanName@@ o) throws DatabaseHandlerException {
+        List<String> params = new ArrayList<>();
+        @@PARAMS@@
+        Optional<Map<String, String>> result;
+        result = databaseHandlerService.executeStoredProcedure("@@beanName_lowercase@@_update", sapiDbName, params, true).stream()
+                .findAny();
+        if (result.isPresent()) {
+            return UUID.fromString(result.get().get("id"));
+        } else {
+            throw new NotFoundException();
+        }
+    }
+
+    /**
+     * Method used to retrieve the {@link @@beanName@@} object matching the specified @@beanName_lowercase@@ ID.
+     */
+    public @@beanName@@ get(UUID id) throws DatabaseHandlerException {
+        List<String> params = new ArrayList<>();
+        params.add(id.toString());
+        Optional<Map<String, String>> result;
+        result = databaseHandlerService.executeStoredProcedure("@@beanName_lowercase@@_get_by_id", sapiDbName, params, true)
+                .stream().findAny();
+        if (result.isPresent()) {
+            return @@beanName@@.parseDataObject(result.get());
+        } else {
+            throw new NotFoundException();
+        }
+    }
+
+    /**
+     * Method used to retrieve the List of all {@link @@beanName@@} objects in the system.
+     */
+    public List<@@beanName@@> getAll() throws DatabaseHandlerException {
+        List<@@beanName@@> @@beanName_lowercase@@s = new ArrayList<>();
+        databaseHandlerService.executeStoredProcedure("@@beanName_lowercase@@_get_all", sapiDbName, new ArrayList<>(), true)
+                .forEach(r -> @@beanName_lowercase@@s.add(@@beanName@@.parseDataObject(r)));
+        return @@beanName_lowercase@@s;
+    }
+
+    /**
+     * Method used to delete the {@link @@beanName@@} object matching the specified @@beanName_lowercase@@ ID.
+     */
+    public void delete(UUID id) throws DatabaseHandlerException {
+        List<String> params = new ArrayList<>();
+        params.add(id.toString());
+        databaseHandlerService.executeStoredProcedure("@@beanName_lowercase@@_delete_by_id", sapiDbName, params, false);
+    }
+}

@@ -44,6 +44,7 @@ caseStatement(col) ::= <<
 case "$col.name$":
     $if(col.uuidType)$$setUuid(col)$
     $elseif(col.dateTimeType)$$setDateTimeCol(col)$
+    $elseif(col.integerType)$$setIntegerType(col)$
     $else$$setCol(col)$
     $endif$
     break;
@@ -57,6 +58,9 @@ setDateTimeCol(col) ::= <<
 result.set$col.fieldName$(DataConverters.converToTimestamp(entry.getValue()));
 >>
 
+setIntegerType(col) ::= <<
+result.set$col.fieldName$(Integer.parseInt(entry.getValue()));
+>>
 setCol(col) ::= <<
 result.set$col.fieldName$(entry.getValue());
 >>

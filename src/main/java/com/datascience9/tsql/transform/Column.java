@@ -33,13 +33,19 @@ public class Column {
     }
 
     public boolean getUuidType() {
-        return type.contains("uniqueidentifier");
+        return type.toLowerCase().contains("uniqueidentifier");
     }
     public boolean getDateTimeType() {
-        return type.contains("datetime");
+        return type.toLowerCase().contains("datetime");
     }
 
-    public boolean getNonString() { return !(type.contains("nvachar") || type.contains("varchar"));}
+    public boolean getIntegerType() {
+        return type.toLowerCase().contains("int");
+    }
+
+    public boolean getNonString() {
+        return !(type.toLowerCase().contains("nvachar") || type.toLowerCase().contains("varchar"));
+    }
 
     @Override
     public String toString() {

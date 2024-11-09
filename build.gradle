@@ -45,8 +45,8 @@ task generateTSQLParser(type: JavaExec) {
     args  grammarFile, "-visitor",  "-package", packageName
 }
 
-task generateStoreProcedure(type: JavaExec) {
+task generateCode(type: JavaExec) {
     println 'generate stored procedure(s)'
     classpath sourceSets.main.runtimeClasspath
-    main = 'com.datascience9.tsql.CreateStoredProc'
+    main = 'com.datascience9.tsql.transform.CodeGenerator'
 }

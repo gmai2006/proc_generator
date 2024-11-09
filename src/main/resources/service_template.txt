@@ -1,11 +1,15 @@
 @@HEADER@@
 
+package mil.dren.erdc.sapi.geosearch.service;
+
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+@@IMPORTEXTRAC@@
 
 /**
  * Default implementation of {@link @@beanName@@Service}.
@@ -23,24 +27,24 @@ public class Default@@beanName@@Service implements @@beanName@@Service {
     }
 
     @Override
-    public UUID create(@@beanName@@ @@beanName_lowercase@@) throws MissingArgumentException, DatabaseHandlerException {
-        UUID uuid = dao.create(@@beanName_lowercase@@);
+    public @@TYPE@@ create(@@beanName@@ @@beanName_lowercase@@) throws MissingArgumentException, DatabaseHandlerException {
+        @@TYPE@@ uuid = dao.create(@@beanName_lowercase@@);
         return uuid;
     }
 
     @Override
     public void delete(@@TYPE@@ id) throws DatabaseHandlerException {
-        dao.delete(ownerId);
+        dao.delete(id);
     }
 
     @Override
     public @@beanName@@ get(@@TYPE@@ id) throws DatabaseHandlerException {
-        return ownerDao.get(id);
+        return dao.get(id);
     }
 
     @Override
     public List<@@beanName@@> getAll() throws DatabaseHandlerException {
-        return ownerDao.getAll();
+        return dao.getAll();
     }
 
     @Override

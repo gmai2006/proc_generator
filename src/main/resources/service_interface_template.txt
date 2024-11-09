@@ -1,0 +1,53 @@
+@@HEADER@@
+
+import jakarta.ejb.Remote;
+import java.util.List;
+import java.util.@@TYPE@@;
+import mil.dren.erdc.sapi.@@beanName_lowercase@@.models.@@beanName@@;
+import mil.dren.erdc.sapi.utils.exceptions.DatabaseHandlerException;
+import mil.dren.erdc.sapi.utils.exceptions.MissingArgumentException;
+
+/**
+ * Service responsible for data @@beanName_lowercase@@ CRUD operations.
+ */
+@Remote
+public interface @@beanName@@Service {
+
+    /**
+     * Creates a data @@beanName_lowercase@@.
+     *
+     * @param @@beanName_lowercase@@          {@link @@beanName@@}
+     * @return @@TYPE@@ @@beanName_lowercase@@ ID
+     */
+    @@TYPE@@ create(@@beanName@@ @@beanName_lowercase@@) throws MissingArgumentException, DatabaseHandlerException;
+
+    /**
+     * Deletes the data @@beanName_lowercase@@ matching the specified @@beanName_lowercase@@ ID.
+     *
+     * @param @@beanName_lowercase@@Id        {@link @@TYPE@@}
+     */
+    void delete(@@TYPE@@ @@beanName_lowercase@@Id) throws DatabaseHandlerException;
+
+    /**
+     * Gets the data @@beanName_lowercase@@ matching the specified @@beanName_lowercase@@ ID.
+     *
+     * @param @@beanName_lowercase@@Id {@link @@TYPE@@}
+     * @return @@beanName_lowercase@@ {@link @@beanName@@}
+     */
+    @@beanName@@ get(@@TYPE@@ @@beanName_lowercase@@Id) throws DatabaseHandlerException;
+
+    /**
+     * Gets all data @@beanName_lowercase@@s.
+     *
+     * @return {@link List} of {@link @@beanName@@}
+     */
+    List<@@beanName@@> getAll() throws DatabaseHandlerException;
+
+    /**
+     * Updates the data @@beanName_lowercase@@ matching the specified @@beanName_lowercase@@ ID.
+     *
+     * @param @@beanName_lowercase@@          {@link @@beanName@@} being modified
+     * @return @@TYPE@@ @@beanName_lowercase@@ ID
+     */
+    @@TYPE@@ update(@@beanName@@ @@beanName_lowercase@@) throws MissingArgumentException, DatabaseHandlerException;
+}

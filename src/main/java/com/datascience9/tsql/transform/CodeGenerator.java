@@ -21,23 +21,24 @@ public class CodeGenerator {
     public static void main(String[] args) throws Exception {
         final List<Table> tables = TableExtractor.generateTablesFromTsql("/tsql.sql");
         final String header = TsqlUtils.loadResource2String("/header.txt");
+        final String importText = TsqlUtils.loadResource2String("/import.txt");
 
         final String stored = tables.stream().map(CodeGenerator::generateStoredProcedure).collect(Collectors.joining("\n"));
         final Path storedOutput = Paths.get("./", "stored.sql");
         TsqlUtils.writeStringWithoutFormatToFile(storedOutput, stored);
-        System.out.println(stored);
 
         tables.stream().forEach(t -> {
-            createDao(t, header);
-            createModel(t, header);
-//            createService(t, header);
+            createDao(t, header, importText);
+            createModel(t, header, importText);
+            createService(t, header, importText);
         });
     }
 
-    static void createDao(Table t, String header) {
+    static void createDao(Table t, String header, String importText) {
         STGroup  stGroup = getStGroupFromClient(CodeGenerator.class, "dao.stg", '$', '$');
         String dao = generateDao(t, stGroup);
         dao = dao.replace("@@HEADER@@", header);
+        dao = dao.replace("@@IMPORTEXTRAC@@", importText);
         final Path output = Paths.get("./src/main/java/", buildCamelCase(t.tableName) + "Dao.java");
         try {
             writeStringToJava(output, dao);
@@ -65,10 +66,11 @@ public class CodeGenerator {
         return source.replace("@@PARAMS@@", st.render());
     }
 
-    static void createModel(Table t, String header) {
+    static void createModel(Table t, String header, String importText) {
         STGroup  stGroup = getStGroupFromClient(CodeGenerator.class, "model.stg", '$', '$');
         String result = generateModel(t, stGroup);
         result = result.replace("@@HEADER@@", header);
+        result = result.replace("@@IMPORTEXTRAC@@", importText);
         final Path output = Paths.get("./src/main/java/", buildCamelCase(t.tableName) + ".java");
         try {
             writeStringToJava(output, result);
@@ -93,21 +95,26 @@ public class CodeGenerator {
 
         ST caseSt = stGroup.getInstanceOf("caseStatements");
         caseSt.add("cols", t.columns);
-        String render = caseSt.render();
-        System.out.println(render);
-        source = source.replace("@@CASES@@", render);
+        source = source.replace("@@CASES@@", caseSt.render());
 
         ST setMethodSt = stGroup.getInstanceOf("setMethods");
         setMethodSt.add("cols", t.columns);
         return source.replace("@@SETMETHODS@@", setMethodSt.render());
     }
 
-    static void createService(Table t, String header) {
+    static void createService(Table t, String header, String importText) {
         String result = generateService(t);
         result = result.replace("@@HEADER@@", header);
-        final Path output = Paths.get("./src/main/java/Default", buildCamelCase(t.tableName) + "Service.java");
+        result = result.replace("@@IMPORTEXTRAC@@", importText);
+
+        String interfaceResult = generateServiceInterface(t);
+        interfaceResult = interfaceResult.replace("@@HEADER@@", header);
+
+        final Path output = Paths.get("./src/main/java/", "Default" + buildCamelCase(t.tableName) + "Service.java");
+        final Path interfaceOutput = Paths.get("./src/main/java/", buildCamelCase(t.tableName) + "Service.java");
         try {
             writeStringToJava(output, result);
+            writeStringToJava(interfaceOutput, interfaceResult);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -115,6 +122,13 @@ public class CodeGenerator {
 
     static String generateService(Table t) {
         String source = TsqlUtils.loadResource2String("/service_template.txt");
+        source = source.replace("@@beanName@@", buildCamelCase(t.tableName));
+        source = source.replace("@@beanName_lowercase@@", buildCamelCase(t.tableName).toLowerCase(Locale.ROOT));
+        return source.replace("@@TYPE@@", t.getPrimaryType());
+    }
+
+    static String generateServiceInterface(Table t) {
+        String source = TsqlUtils.loadResource2String("/service_interface_template.txt");
         source = source.replace("@@beanName@@", buildCamelCase(t.tableName));
         source = source.replace("@@beanName_lowercase@@", buildCamelCase(t.tableName).toLowerCase(Locale.ROOT));
         return source.replace("@@TYPE@@", t.getPrimaryType());

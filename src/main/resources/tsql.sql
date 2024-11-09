@@ -1,71 +1,69 @@
-/* CREATE THE geosearch TABLES IN THE LOCAL PERSISTENCE DATABASE */
-if exists (select * from INFORMATION_SCHEMA.TABLES where table_name = 'geosearch_ads')
+/* CREATE THE test TABLES IN THE LOCAL PERSISTENCE DATABASE */
+if exists (select * from INFORMATION_SCHEMA.TABLES where table_name = 'testads')
 begin
-    DROP TABLE geosearch_ads
+    DROP TABLE testads
 END
 GO
-CREATE TABLE geosearch_ads (
+CREATE TABLE testads (
     ads nvarchar(128) NOT NULL,
     viewName nvarchar(512) NOT NULL,
     displayName nvarchar(128) NULL,
-    mbpsWildflyDataSource nvarchar(128) NOT NULL,
-    symbolCustomDataKey nvarchar(128) NULL,
-    CONSTRAINT pk_geosearch_ads PRIMARY KEY(ads)
+    CONSTRAINT pk_testads PRIMARY KEY(ads)
 )
 GO
 
-if exists (select * from INFORMATION_SCHEMA.TABLES where table_name = 'geosearch_column')
+if exists (select * from INFORMATION_SCHEMA.TABLES where table_name = 'testcolumn')
 BEGIN
-    DROP TABLE geosearch_column
+    DROP TABLE testcolumn
 END
 GO
 
-CREATE TABLE geosearch_column (
+CREATE TABLE testcolumn (
     id uniqueidentifier NOT NULL,
     ads nvarchar(128) NOT NULL,
     columnName nvarchar(512) NOT NULL,
     displayName nvarchar(128) NOT NULL,
     dataType nvarchar(128) NOT NULL,
-    CONSTRAINT pk_geosearch_column PRIMARY KEY(id)
+    CONSTRAINT pk_testcolumn PRIMARY KEY(id)
 )
 GO
 
-if exists (select * from INFORMATION_SCHEMA.TABLES where table_name = 'geosearch_dictionary')
+if exists (select * from INFORMATION_SCHEMA.TABLES where table_name = 'testdictionary')
 BEGIN
-    DROP TABLE geosearch_dictionary
+    DROP TABLE testdictionary
 END
 GO
 
-CREATE TABLE geosearch_dictionary (
+CREATE TABLE testdictionary (
     id uniqueidentifier NOT NULL,
     ads nvarchar(128) NOT NULL,
     columnName nvarchar(512) NOT NULL,
     value nvarchar(512) NOT NULL,
     translation VARCHAR(5000) NOT NULL,
-    CONSTRAINT pk_geosearch_dictionary PRIMARY KEY(id)
+    CONSTRAINT pk_testdictionary PRIMARY KEY(id)
 )
 GO
 
-if exists (select * from INFORMATION_SCHEMA.TABLES where table_name = 'geosearch_query')
+if exists (select * from INFORMATION_SCHEMA.TABLES where table_name = 'testquery')
 begin
-    DROP TABLE geosearch_query
+    DROP TABLE testquery
 END
 GO
-CREATE TABLE geosearch_query (
+CREATE TABLE testquery (
     queryId uniqueidentifier NOT NULL,
     name nvarchar(128) NULL,
     startIndex int NULL,
     pageSize int NULL,
-    CONSTRAINT geosearch_query_primary PRIMARY KEY(queryId)
+    CONSTRAINT testquery_primary PRIMARY KEY(queryId)
 )
 GO
 
-if exists (select * from INFORMATION_SCHEMA.TABLES where table_name = 'geosearch_attribute_filter')
+if exists (select * from INFORMATION_SCHEMA.TABLES where table_name = 'testattribute_name')
 begin
-    DROP TABLE geosearch_attribute_filter
+    DROP TABLE testattribute_name
 END
 GO
-CREATE TABLE geosearch_attribute_filter (
+CREATE TABLE testattribute_name (
     id uniqueidentifier NOT NULL,
     queryId uniqueidentifier NOT NULL,
     ads nvarchar(24) NOT NULL,
@@ -74,33 +72,33 @@ CREATE TABLE geosearch_attribute_filter (
     value nvarchar(128) NULL,
     dataType nvarchar(64) NULL,
     operation nvarchar(24) NULL,
-    CONSTRAINT geosearch_attribute_filter_primary PRIMARY KEY(id)
+    CONSTRAINT testattribute_name_primary PRIMARY KEY(id)
 )
 GO
 
-if exists (select * from INFORMATION_SCHEMA.TABLES where table_name = 'geosearch_circle_filter')
+if exists (select * from INFORMATION_SCHEMA.TABLES where table_name = 'testcircle_name')
 begin
-    DROP TABLE geosearch_circle_filter
+    DROP TABLE testcircle_name
 END
 GO
-CREATE TABLE geosearch_circle_filter (
+CREATE TABLE testcircle_name (
     id uniqueidentifier NOT NULL,
     queryId uniqueidentifier NOT NULL,
     center nvarchar(128) NOT NULL,
     periphery nvarchar(128) NOT NULL,
-    CONSTRAINT geosearch_circle_filter_primary PRIMARY KEY(id)
+    CONSTRAINT testcircle_name_primary PRIMARY KEY(id)
 )
 GO
 
-if exists (select * from INFORMATION_SCHEMA.TABLES where table_name = 'geosearch_polygon_filter')
+if exists (select * from INFORMATION_SCHEMA.TABLES where table_name = 'testpolygon_name')
 begin
-    DROP TABLE geosearch_polygon_filter
+    DROP TABLE testpolygon_name
 END
 GO
-CREATE TABLE geosearch_polygon_filter (
+CREATE TABLE testpolygon_name (
     id uniqueidentifier NOT NULL,
-    queryId uniqueidentifier NOT NULL,
+    queryId nvarchar(36) NOT NULL,
     coordinates nvarchar(512) NOT NULL,
-    CONSTRAINT geosearch_polygon_filter_primary PRIMARY KEY(id)
+    CONSTRAINT testpolygon_name_primary PRIMARY KEY(id)
 )
 GO

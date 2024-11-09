@@ -8,9 +8,9 @@
   update the template.
 
 ## Generate the source codes
-- Run gradle generateCode.  It should generate the following source codes
-1. a stored procedure file called stored.sql in the project directory
-2. all model, dao, services classes in the src/main/java
+- Run gradle generateCode.  It should generate the following source codes under a directory named generated
+1. a stored procedure file called stored.sql
+2. all model, dao, services classes
 
 ## TSql validator
 - Go to the test/resources and override the test1.sql your Tsql script and run the ParserInspector. It should open the parse tree

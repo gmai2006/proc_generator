@@ -13,21 +13,22 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
+import java.util.@@TYPE@@;
 
 @@IMPORTEXTRAC@@
 
 /**
- * REST context and service for data owner related functionality.
+ * REST context and service for data @@beanName_lowercase@@ related functionality.
+ *
  */
 @Path("/v1")
-public class V1 {
+public class @@beanName@@RestService {
 
     @Context
     private HttpServletRequest request;
 
-    @EJB(lookup = "java:global/sapi-owner/sapi-owner-service/OwnerService")
-    private OwnerService ownerService;
+    @EJB(lookup = "java:global/sapi-@@beanName_lowercase@@/sapi-@@beanName_lowercase@@-service/@@beanName@@Service")
+    private @@beanName@@Service @@beanName_lowercase@@Service;
 
     /**
      * Method to test service's state.
@@ -42,75 +43,69 @@ public class V1 {
     }
 
     /**
-     * Creates a data owner.
+     * Creates a data @@beanName_lowercase@@.
      *
-     * @param owner {@link Owner}
-     * @return UUID as {@link String} owner ID
+     * @param @@beanName_lowercase@@ {@link @@beanName@@}
+     * @return @@TYPE@@ as {@link String} @@beanName_lowercase@@ ID
      */
     @POST
     @Path("/")
     @Produces(MediaType.TEXT_PLAIN)
-    @Authorize({Permission.OWNER_CREATE})
-    public UUID create(Owner owner) throws MissingArgumentException, DatabaseHandlerException {
+    public @@TYPE@@ create(@@beanName@@ @@beanName_lowercase@@) throws MissingArgumentException, DatabaseHandlerException {
         String requestingUser = request.getUserPrincipal().getName();
-        return ownerService.create(owner, requestingUser);
+        return @@beanName_lowercase@@Service.create(@@beanName_lowercase@@);
     }
 
     /**
-     * Deletes the data owner matching the specified owner ID.
+     * Deletes the data @@beanName_lowercase@@ matching the specified @@beanName_lowercase@@ ID.
      *
-     * @param ownerId UUID as {@link String}
+     * @param @@beanName_lowercase@@Id @@TYPE@@ as {@link String}
      */
     @DELETE
-    @Path("/{ownerId: [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}")
-    @Authorize({Permission.OWNER_DELETE})
-    public void delete(@PathParam("ownerId") String ownerId) throws DatabaseHandlerException {
+    @Path("/{@@beanName_lowercase@@Id")
+    public void delete(@PathParam("@@beanName_lowercase@@Id") String @@beanName_lowercase@@Id) throws DatabaseHandlerException {
         String requestingUser = request.getUserPrincipal().getName();
-        ownerService.delete(UUID.fromString(ownerId), requestingUser);
+        @@beanName_lowercase@@Service.delete(@@TYPE@@.fromString(@@beanName_lowercase@@Id));
     }
 
     /**
-     * Gets the data owner matching the specified owner ID.
+     * Gets the data @@beanName_lowercase@@ matching the specified @@beanName_lowercase@@ ID.
      *
-     * @param ownerId UUID as {@link String}
-     * @return owner {@link Owner}
+     * @param @@beanName_lowercase@@Id @@TYPE@@ as {@link String}
+     * @return @@beanName_lowercase@@ {@link @@beanName@@}
      */
     @GET
-    @Path("/{ownerId: [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}")
+    @Path("/{@@beanName_lowercase@@Id: [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}")
     @Produces(MediaType.APPLICATION_JSON)
-    @Authorize({Permission.OWNER_READ})
-    public Owner get(@PathParam("ownerId") String ownerId) throws DatabaseHandlerException {
-        return ownerService.get(UUID.fromString(ownerId));
+    public @@beanName@@ get(@PathParam("@@beanName_lowercase@@Id") String @@beanName_lowercase@@Id) throws DatabaseHandlerException {
+        return @@beanName_lowercase@@Service.get(@@TYPE@@.fromString(@@beanName_lowercase@@Id));
     }
 
     /**
-     * Gets all data owners.
+     * Gets all data @@beanName_lowercase@@s.
      *
-     * @return {@link List} of {@link Owner}
+     * @return {@link List} of {@link @@beanName@@}
      */
     @GET
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
-    @Authorize({Permission.OWNER_READ})
-    public List<Owner> getAll() throws DatabaseHandlerException {
-        return ownerService.getAll();
+    public List<@@beanName@@> getAll() throws DatabaseHandlerException {
+        return @@beanName_lowercase@@Service.getAll();
     }
 
     /**
-     * Updates the data owner matching the specified owner ID.
+     * Updates the data @@beanName_lowercase@@ matching the specified @@beanName_lowercase@@ ID.
      *
-     * @param ownerId UUID as {@link String}
-     * @param owner   {@link Owner} being modified
-     * @return UUID as {@link String} owner ID
+     * @param @@beanName_lowercase@@Id @@TYPE@@ as {@link String}
+     * @param @@beanName_lowercase@@   {@link @@beanName@@} being modified
+     * @return @@TYPE@@ as {@link String} @@beanName_lowercase@@ ID
      */
     @PUT
-    @Path("/{ownerId: [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}")
+    @Path("/{@@beanName_lowercase@@Id")
     @Produces(MediaType.TEXT_PLAIN)
-    @Authorize({Permission.OWNER_UPDATE})
-    public UUID update(@PathParam("ownerId") String ownerId, Owner owner) throws MissingArgumentException,
+    public @@TYPE@@ update(@PathParam("@@beanName_lowercase@@Id") String @@beanName_lowercase@@Id, @@beanName@@ @@beanName_lowercase@@) throws MissingArgumentException,
             DatabaseHandlerException {
-        String requestingUser = request.getUserPrincipal().getName();
-        owner.setId(UUID.fromString(ownerId));
-        return ownerService.update(owner, requestingUser);
+        @@beanName_lowercase@@.setId(@@TYPE@@.fromString(@@beanName_lowercase@@Id));
+        return @@beanName_lowercase@@Service.update(@@beanName_lowercase@@);
     }
 }

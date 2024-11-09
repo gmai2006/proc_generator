@@ -3,6 +3,7 @@ package com.datascience9.tsql.transform;
 import com.google.googlejavaformat.java.Formatter;
 import com.google.googlejavaformat.java.FormatterException;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -18,28 +19,39 @@ import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.StringRenderer;
 
 public class CodeGenerator {
+    static final String OUTPUTDIR = "./generated";
     public static void main(String[] args) throws Exception {
+        final File dir = new File(OUTPUTDIR);
+        if (!dir.exists()) dir.mkdir();
+        else cleanUp(dir);
+
         final List<Table> tables = TableExtractor.generateTablesFromTsql("/tsql.sql");
         final String header = TsqlUtils.loadResource2String("/header.txt");
         final String importText = TsqlUtils.loadResource2String("/import.txt");
 
         final String stored = tables.stream().map(CodeGenerator::generateStoredProcedure).collect(Collectors.joining("\n"));
-        final Path storedOutput = Paths.get("./", "stored.sql");
+        final Path storedOutput = Paths.get(OUTPUTDIR, "stored.sql");
         TsqlUtils.writeStringWithoutFormatToFile(storedOutput, stored);
 
         tables.stream().forEach(t -> {
             createDao(t, header, importText);
             createModel(t, header, importText);
             createService(t, header, importText);
+            createRest(t, header, importText);
         });
     }
 
+    static void cleanUp(File dir) {
+        for(File file: dir.listFiles())
+            if (!file.isDirectory())
+                file.delete();
+    }
     static void createDao(Table t, String header, String importText) {
-        STGroup  stGroup = getStGroupFromClient(CodeGenerator.class, "dao.stg", '$', '$');
+        final STGroup  stGroup = getStGroupFromClient(CodeGenerator.class, "dao.stg", '$', '$');
         String dao = generateDao(t, stGroup);
         dao = dao.replace("@@HEADER@@", header);
         dao = dao.replace("@@IMPORTEXTRAC@@", importText);
-        final Path output = Paths.get("./src/main/java/", buildCamelCase(t.tableName) + "Dao.java");
+        final Path output = Paths.get(OUTPUTDIR, buildCamelCase(t.tableName) + "Dao.java");
         try {
             writeStringToJava(output, dao);
         } catch (IOException e) {
@@ -67,11 +79,11 @@ public class CodeGenerator {
     }
 
     static void createModel(Table t, String header, String importText) {
-        STGroup  stGroup = getStGroupFromClient(CodeGenerator.class, "model.stg", '$', '$');
+        final STGroup  stGroup = getStGroupFromClient(CodeGenerator.class, "model.stg", '$', '$');
         String result = generateModel(t, stGroup);
         result = result.replace("@@HEADER@@", header);
         result = result.replace("@@IMPORTEXTRAC@@", importText);
-        final Path output = Paths.get("./src/main/java/", buildCamelCase(t.tableName) + ".java");
+        final Path output = Paths.get(OUTPUTDIR, buildCamelCase(t.tableName) + ".java");
         try {
             writeStringToJava(output, result);
         } catch (IOException e) {
@@ -85,33 +97,33 @@ public class CodeGenerator {
         source = source.replace("@@beanName_lowercase@@", buildCamelCase(t.tableName).toLowerCase(Locale.ROOT));
         source = source.replace("@@LIST@@", t.generateListOfParameters());
 
-        ST memberSt = stGroup.getInstanceOf("members");
+        final ST memberSt = stGroup.getInstanceOf("members");
         memberSt.add("cols", t.columns);
         source = source.replace("@@MEMBERS@@", memberSt.render());
 
-        ST getMethodSt = stGroup.getInstanceOf("getMethods");
+        final ST getMethodSt = stGroup.getInstanceOf("getMethods");
         getMethodSt.add("cols", t.columns);
         source = source.replace("@@GETMETHODS@@", getMethodSt.render());
 
-        ST caseSt = stGroup.getInstanceOf("caseStatements");
+        final ST caseSt = stGroup.getInstanceOf("caseStatements");
         caseSt.add("cols", t.columns);
         source = source.replace("@@CASES@@", caseSt.render());
 
-        ST setMethodSt = stGroup.getInstanceOf("setMethods");
+        final ST setMethodSt = stGroup.getInstanceOf("setMethods");
         setMethodSt.add("cols", t.columns);
         return source.replace("@@SETMETHODS@@", setMethodSt.render());
     }
 
     static void createService(Table t, String header, String importText) {
-        String result = generateService(t);
+        String result = generateCommonClasses(t, "/service_template.txt");
         result = result.replace("@@HEADER@@", header);
         result = result.replace("@@IMPORTEXTRAC@@", importText);
 
-        String interfaceResult = generateServiceInterface(t);
+        String interfaceResult = generateCommonClasses(t, "/service_interface_template.txt");
         interfaceResult = interfaceResult.replace("@@HEADER@@", header);
 
-        final Path output = Paths.get("./src/main/java/", "Default" + buildCamelCase(t.tableName) + "Service.java");
-        final Path interfaceOutput = Paths.get("./src/main/java/", buildCamelCase(t.tableName) + "Service.java");
+        final Path output = Paths.get(OUTPUTDIR, "Default" + buildCamelCase(t.tableName) + "Service.java");
+        final Path interfaceOutput = Paths.get(OUTPUTDIR, buildCamelCase(t.tableName) + "Service.java");
         try {
             writeStringToJava(output, result);
             writeStringToJava(interfaceOutput, interfaceResult);
@@ -120,22 +132,28 @@ public class CodeGenerator {
         }
     }
 
-    static String generateService(Table t) {
-        String source = TsqlUtils.loadResource2String("/service_template.txt");
-        source = source.replace("@@beanName@@", buildCamelCase(t.tableName));
-        source = source.replace("@@beanName_lowercase@@", buildCamelCase(t.tableName).toLowerCase(Locale.ROOT));
-        return source.replace("@@TYPE@@", t.getPrimaryType());
+    static void createRest(Table t, String header, String importText) {
+        String result = generateCommonClasses(t, "/rest_template.txt");
+        result = result.replace("@@HEADER@@", header);
+        result = result.replace("@@IMPORTEXTRAC@@", importText);
+        final Path output = Paths.get(OUTPUTDIR, buildCamelCase(t.tableName) + "RestService.java");
+
+        try {
+            writeStringToJava(output, result);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    static String generateServiceInterface(Table t) {
-        String source = TsqlUtils.loadResource2String("/service_interface_template.txt");
+    static String generateCommonClasses(Table t, String templateFile) {
+        String source = TsqlUtils.loadResource2String(templateFile);
         source = source.replace("@@beanName@@", buildCamelCase(t.tableName));
         source = source.replace("@@beanName_lowercase@@", buildCamelCase(t.tableName).toLowerCase(Locale.ROOT));
         return source.replace("@@TYPE@@", t.getPrimaryType());
     }
 
     public static STGroup getStGroupFromClient(Class clazz, String templateFile, char openToken, char endToken) {
-        STGroup stGroup = new STGroupFile(Objects.requireNonNull(clazz.getClassLoader().getResource(templateFile)), "UTF-8", openToken, endToken);
+        final STGroup stGroup = new STGroupFile(Objects.requireNonNull(clazz.getClassLoader().getResource(templateFile)), "UTF-8", openToken, endToken);
         stGroup.registerRenderer(String.class, new StringRenderer());
         return stGroup;
     }

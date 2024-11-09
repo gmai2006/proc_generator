@@ -8,7 +8,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Class representative of data owner objects.
+ * Class representative of data @@beanName@@ objects.
+ *
  */
 public class @@beanName@@ implements Serializable {
 
@@ -29,6 +30,12 @@ public class @@beanName@@ implements Serializable {
         return Objects.hash(@@LIST@@);
     }
 
+    /**
+       * Method used to parse a database result set into a {@link GeosearchDictionary} object.
+       *
+       * @param stringMap - the map from DB.
+       * @return @@beanName@@ - the @@beanName@@ object
+       */
     public static @@beanName@@ parseDataObject(Map<String, String> stringMap) {
             @@beanName@@ result = new @@beanName@@();
             for (Map.Entry<String, String> entry : stringMap.entrySet()) {

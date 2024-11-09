@@ -7,14 +7,14 @@ $cols: {col | $member(col.type, col.name)$}; separator="\n"$
 >>
 
 getMethods(cols) ::=<<
-$cols: {col | $getMethod(col)$}; separator="\n"$
+$cols: {col | $getMethod(col)$}; separator="\n\n"$
 >>
 
 getMethod(col) ::= <<
 /**
      * Gets the $col.name$ field value.
      *
-     * @return $col.name$
+     * @return $col.name$  - the $col.name$.
      */
     public $col.type$ get$col.fieldName$() {
         return $col.name$;
@@ -22,14 +22,14 @@ getMethod(col) ::= <<
 >>
 
 setMethods(cols) ::= <<
-$cols: {col | $setMethod(col)$}; separator="\n"$
+$cols: {col | $setMethod(col)$}; separator="\n\n"$
 >>
 
 setMethod(col) ::= <<
 /**
      * Sets the  $col.name$ field value.
      *
-     * @param  $col.name$
+     * @param  $col.name$ - the $col.name$.
      */
     public void set$col.fieldName$($col.type$ $col.name$) {
         this.$col.name$ = $col.name$;
